@@ -10,8 +10,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
+#include <string.h>
 
-#define num 5 + 1
+#define num 4 + 1
 
 double sigmoid(int i,double sum[num]);
 double energy(void);
@@ -20,96 +22,59 @@ double ConstantValue(void);
 double ObtaineTheta(int n,double c);
 double ObtaineWeight(int n,int m,double theta_n,double theta_m,double c);
 void initialization(void);
+void CountState(double x[num]);
 
-double a[num][num] =
-{ {0.0,1.0,-1.0,-1.0,1.0,-2.0},
-    {-3.0,2.0,0.0,1.0,-1.0,2.0},
-    {-1.0,-1.0,2.0,0.0,-1.0,1.0},
-    {1.0,0.0,-2.0,1.0,-1.0,0.0,},
-    {-3.0,1.0,-1.0,2.0,-1.0,1.0,},
-    {0.0,0.0,0.0,0.0,0.0,0.0}
-};
-double w[num][num];//重み
+double a[num][num];
+double theta[num] = {0.0,-0.5,-0.5,-0.5,-0.5}; //閾値
+double w[num][num] = 
+{ {0.0,theta[1],theta[2],theta[3],theta[4]},
+  {theta[1],0.0,10.0,0.0,-20.0},
+  {theta[2],10.0,0.0,0.0,12.0},
+  {theta[3],0.0,-15.0,0.0,31.0},
+  {theta[4],19.0,0.0,-40.0,0.0} };//重み
 double x[num]; //後で変える//最初はダミーニューロン
 double y[num];
-double theta[num];
+double sum[num]; //重み付け総和
+double Pr_x[16]; //出現確率
 
 int main(void){
     static double sum[num];
     static double E; //エネルギー関数
     static double const_value;
     int i,j,k;
-    const_value = ConstantValue();
-    
-    for(i=0;i<num;i++){
-        
-        for(j=0;j<num;j++){
-            if(i == j){
-                w[i][j] = 0.0;
-            }
-            else if(i == 0){
-                w[i][j] = -ObtaineTheta(j,const_value);
-            }
-            else if(j == 0){
-                w[i][j] = -ObtaineTheta(i,const_value);
-            }
-            else{
-                w[i][j] = ObtaineWeight(i, j, ObtaineTheta(i,const_value), ObtaineTheta(j,const_value), const_value);
-            }
-            printf("w[%d][%d]:%lf\n",i,j,w[i][j]);
-        }
+
+    for(i=0;i<16;i++){
+        Pr_x[i] = 0.0; //Pr_xの初期化
     }
-    initialization();//xの初期値を与える
-    for(k=0;k<num;k++){
-        if(k != 0){
-            //printf("x%d:%lf",k,x[k]);
-            //printf(",");
-            if(k == (num - 1)){
-                printf("\n");
-            }
-        }
-    }
-    
-    for(i=0;i<100;i++){
+    initialization(); //xの初期値決定
+
+    for(i=0;i<30;i++){
+
         for(j=0;j<num;j++){
+
             if(j != 0){
                 for(k=0;k<num;k++){
-                    x[0] = 1.0;
                     sum[j] += w[k][j] * x[k];
-                }
-                //printf("sum[%d]:%lf\n",j,sum[j]);
-                //xの値を更新
-                if(sum[j]>=0){
+                }   
+                if(rand() < RAND_MAX * sigmoid(j,sum)){
                     x[j] = 1.0;
                 }
                 else{
                     x[j] = 0.0;
                 }
-                for(k=0;k<num;k++){
-                    if(k != 0){
-                        /*
-                         printf("x%d:%lf",k,x[k]);
-                         printf(",");
-                         if(k == (num - 1)){
-                         printf("\n");
-                         }*/
-                    }
-                }
-                //エネルギーの評価
-                //E = SimultaneousEqu(x);
-                E = energy();
-                //printf("E:%lf\n",-0.5*E);
+                CountState(x);
+                //E = energy();
+                //printf("%lf\n",-0.5*E);
+                sum[j] = 0.0;
             }
-            sum[j] = 0.0;
         }
     }
-    
     
 }
 
 double sigmoid(int i,double sum[]){
     double p;
-    double a = 0.5;
+    double a = 1.5;
     p = 1 / (1 + exp(-a * sum[i]));
     
     return p;
@@ -193,11 +158,83 @@ double SimultaneousEqu(double x[num]){
 }
 
 void initialization(void){
-    double ini_x[num] = {1.0,1.0,0.0,1.0,0.0,0.0};//最初の１はダミーニューロン
+    double ini_x[num] = {1.0,0.0,0.0,0.0,0.0};//最初の１はダミーニューロン
     int i;
     
+    //srand((unsigned)time(NULL));//0と1を適当に決めるための乱数
     for(i=0;i<num;i++){
         x[i] = ini_x[i];
     }
     
 }
+
+void CountState(double x[num]){
+    char str[100];
+    int i;
+
+    for(i=0;i<num;i++){
+        if(i !=0 ){
+            if(x[i] == 1.0){
+                str[i-1] = '1';
+            }
+            else if(x[i] == 0.0){
+                str[i-1] = '0';
+            }
+            else{
+                str[i-1] = 'n';
+            }
+        }
+    }
+    printf("%s\n",str);
+
+    if(!strcmp(str,"0000")){
+        Pr_x[0] += 1.0; 
+    }
+    else if(!strcmp(str,"0001")){
+        Pr_x[1] += 1.0; 
+    }
+    else if(!strcmp(str,"0010")){
+        Pr_x[2] += 1.0; 
+    }
+    else if(!strcmp(str,"0011")){
+        Pr_x[3] += 1.0; 
+    }
+    else if(!strcmp(str,"0100")){
+        Pr_x[4] += 1.0; 
+    }
+    else if(!strcmp(str,"0101")){
+        Pr_x[5] += 1.0; 
+    }
+    else if(!strcmp(str,"0110")){
+        Pr_x[6] += 1.0; 
+    }
+    else if(!strcmp(str,"0111")){
+        Pr_x[7] += 1.0; 
+    }
+    else if(!strcmp(str,"1000")){
+        Pr_x[8] += 1.0; 
+    }
+    else if(!strcmp(str,"1001")){
+        Pr_x[9] += 1.0; 
+    }
+    else if(!strcmp(str,"1010")){
+        Pr_x[10] += 1.0; 
+    }
+    else if(!strcmp(str,"1011")){
+        Pr_x[11] += 1.0; 
+    }
+    else if(!strcmp(str,"1100")){
+        Pr_x[12] += 1.0; 
+    }
+    else if(!strcmp(str,"1101")){
+        Pr_x[13] += 1.0; 
+    }
+    else if(!strcmp(str,"1110")){
+        Pr_x[14] += 1.0; 
+    }
+    else if(!strcmp(str,"1111")){
+        Pr_x[15] += 1.0; 
+    }
+}
+
+
