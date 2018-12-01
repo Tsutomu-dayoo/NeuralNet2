@@ -14,6 +14,7 @@
 #include <string.h>
 
 #define num 4 + 1
+#define num_tri 300000
 
 double sigmoid(int i,double sum[num]);
 double energy(void);
@@ -23,6 +24,7 @@ double ObtaineTheta(int n,double c);
 double ObtaineWeight(int n,int m,double theta_n,double theta_m,double c);
 void initialization(void);
 void CountState(double x[num]);
+void Probability(void);
 
 double a[num][num];
 double theta[num] = {0.0,-0.5,-0.5,-0.5,-0.5}; //閾値
@@ -48,7 +50,7 @@ int main(void){
     }
     initialization(); //xの初期値決定
 
-    for(i=0;i<30;i++){
+    for(i=0;i<num_tri;i++){
 
         for(j=0;j<num;j++){
 
@@ -66,9 +68,11 @@ int main(void){
                 //E = energy();
                 //printf("%lf\n",-0.5*E);
                 sum[j] = 0.0;
+                //printf("aaa\n");
             }
         }
     }
+    Probability();
     
 }
 
@@ -185,7 +189,7 @@ void CountState(double x[num]){
             }
         }
     }
-    printf("%s\n",str);
+    //printf("%s\n",str);
 
     if(!strcmp(str,"0000")){
         Pr_x[0] += 1.0; 
@@ -237,4 +241,11 @@ void CountState(double x[num]){
     }
 }
 
+void Probability(void){
+    int i;
+
+    for(i=0;i<16;i++){
+        printf("Pr_x[%d] : %lf \n",i,Pr_x[i] / ((num-1) * num_tri));
+    }
+}
 
