@@ -14,7 +14,7 @@
 #include <string.h>
 
 #define num 4 + 1
-#define num_tri 3
+#define num_tri 1000000
 
 double sigmoid(int i,double sum[num]);
 double energy(void);
@@ -68,7 +68,7 @@ int main(void){
             else{
                 w[i][j] = ObtaineWeight(i, j, ObtaineTheta(i,const_value), ObtaineTheta(j,const_value), const_value);
             }
-            printf("w[%d][%d]:%lf\n",i,j,w[i][j]);
+            //printf("w[%d][%d]:%lf\n",i,j,w[i][j]);
         }
     }
     initialization();//xの初期値を与える
@@ -83,6 +83,7 @@ int main(void){
     }
     
     for(i=0;i<num_tri;i++){
+
         for(j=0;j<num;j++){
             if(j != 0){
                 for(k=0;k<num;k++){
@@ -91,7 +92,8 @@ int main(void){
                 }
                 //printf("sum[%d]:%lf\n",j,sum[j]);
                 //xの値を更新
-                if(sum[j]>=0){
+                //if(sum[j]>=0){
+                if(rand() < RAND_MAX * sigmoid(j,sum)){
                     x[j] = 1.0;
                 }
                 else{
@@ -107,19 +109,19 @@ int main(void){
                     }
                 }
                 //エネルギーの評価
-                //E = SimultaneousEqu(x);
+                E = SimultaneousEqu(x);
                 E = energy();
-                //printf("E:%lf\n",-0.5*E);
+                
             }
             sum[j] = 0.0;
         }
     }
-    
+    printf("E:%lf\n",-0.5*E);
 }
 
 double sigmoid(int i,double sum[]){
     double p;
-    double a = 100;
+    double a = 0.05;
     p = 1 / (1 + exp(-a * sum[i]));
     
     return p;
