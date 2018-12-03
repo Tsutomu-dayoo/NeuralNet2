@@ -14,7 +14,7 @@
 #include <string.h>
 
 #define num 4 + 1
-#define num_tri 100000
+#define num_tri 3
 
 double sigmoid(int i,double sum[num]);
 double energy(void);
@@ -26,20 +26,20 @@ void initialization(void);
 void CountState(double x[num]);
 void Probability(void);
 
+/*double a[num-1][num] = {
+    {0.0,1.0,1.0,-1.0},
+    {-2.0,1.0,0.0,1.0},
+    {1.0,0.0,-1.0,-1.0}
+};*/
 double a[num][num] = 
 { 
     {-2.0,1.0,1.0,1.0,-1.0},
     {-3.0,2.0,0.0,1.0,2.0,},
-    {1.0,2.0,0.0,-1.0,-1.0},
-    {1.0,3.0,-1.0,-1.0,-1.0}
+    {1.0,-1.0,2.0,0.0,-1.0},
+    {1.0,0.0,3.0,-1.0,-1.0}
 };
-double theta[num] = {0.0,-0.5,-0.5,-0.5,-0.5}; //閾値
-double w[num][num] = 
-{ {0.0,theta[1],theta[2],theta[3],theta[4]},
-  {theta[1],0.0,10.0,0.0,-20.0},
-  {theta[2],10.0,0.0,0.0,12.0},
-  {theta[3],0.0,-15.0,0.0,31.0},
-  {theta[4],19.0,0.0,-40.0,0.0} };//重み
+double theta[num]; //閾値
+double w[num][num];//重み
 double x[num]; //後で変える//最初はダミーニューロン
 double y[num];
 double sum[num]; //重み付け総和
@@ -51,34 +51,69 @@ int main(void){
     static double const_value;
     int i,j,k;
 
-    for(i=0;i<16;i++){
-        Pr_x[i] = 0.0; //Pr_xの初期化
-    }
-    initialization(); //xの初期値決定
-
-    for(i=0;i<num_tri;i++){
-
+    const_value = ConstantValue();
+    
+    for(i=0;i<num;i++){
+        
         for(j=0;j<num;j++){
-
+            if(i == j){
+                w[i][j] = 0.0;
+            }
+            else if(i == 0){
+                w[i][j] = -ObtaineTheta(j,const_value);
+            }
+            else if(j == 0){
+                w[i][j] = -ObtaineTheta(i,const_value);
+            }
+            else{
+                w[i][j] = ObtaineWeight(i, j, ObtaineTheta(i,const_value), ObtaineTheta(j,const_value), const_value);
+            }
+            printf("w[%d][%d]:%lf\n",i,j,w[i][j]);
+        }
+    }
+    initialization();//xの初期値を与える
+    for(k=0;k<num;k++){
+        if(k != 0){
+            //printf("x%d:%lf",k,x[k]);
+            //printf(",");
+            if(k == (num - 1)){
+                printf("\n");
+            }
+        }
+    }
+    
+    for(i=0;i<num_tri;i++){
+        for(j=0;j<num;j++){
             if(j != 0){
                 for(k=0;k<num;k++){
+                    x[0] = 1.0;
                     sum[j] += w[k][j] * x[k];
-                }   
-                if(rand() < RAND_MAX * sigmoid(j,sum)){
+                }
+                //printf("sum[%d]:%lf\n",j,sum[j]);
+                //xの値を更新
+                if(sum[j]>=0){
                     x[j] = 1.0;
                 }
                 else{
                     x[j] = 0.0;
                 }
-                CountState(x);
-                //E = energy();
-                //printf("%lf\n",-0.5*E);
-                sum[j] = 0.0;
-                //printf("aaa\n");
+                for(k=0;k<num;k++){
+                    if(k != 0){ 
+                        printf("x%d:%lf",k,x[k]);
+                        printf(",");
+                        if(k == (num - 1)){
+                            printf("\n");
+                        }
+                    }
+                }
+                //エネルギーの評価
+                //E = SimultaneousEqu(x);
+                E = energy();
+                //printf("E:%lf\n",-0.5*E);
             }
+            sum[j] = 0.0;
         }
     }
-    Probability();
     
 }
 
@@ -148,6 +183,7 @@ double ConstantValue(void){
         }
     }
     C = SimultaneousEqu(x);
+    printf("%lf\n",C);
     return C;
 }
 
@@ -156,7 +192,7 @@ double SimultaneousEqu(double x[num]){
     double sum = 0.0;
     int i,j;
     
-    for(i=0;i<num;i++){
+    for(i=0;i<num-1;i++){
         
         for(j=0;j<num;j++){
             sum += a[i][j] * x[j];
