@@ -14,7 +14,7 @@
 #include <string.h>
 
 #define num 4 + 1
-#define num_tri 300000
+#define num_tri 100000
 
 double sigmoid(int i,double sum[num]);
 double energy(void);
@@ -78,7 +78,7 @@ int main(void){
 
 double sigmoid(int i,double sum[]){
     double p;
-    double a = 1.5;
+    double a = 100;
     p = 1 / (1 + exp(-a * sum[i]));
     
     return p;
