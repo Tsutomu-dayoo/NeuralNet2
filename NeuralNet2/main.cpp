@@ -99,7 +99,7 @@ int main(void){
                 else{
                     x[j] = 0.0;
                 }
-                /*
+                /*//デバッグ用↓
                 for(k=0;k<num;k++){
                     if(k != 0){ 
                         printf("x%d:%lf",k,x[k]);
@@ -111,7 +111,6 @@ int main(void){
                 }*/
                 CountState(x);
                 //エネルギーの評価
-                //E = SimultaneousEqu(x);
                 E = energy();
                 //printf("E:%lf\n",-0.5*E);
                 
@@ -119,11 +118,12 @@ int main(void){
             sum[j] = 0.0;
         }
     }
+    Probability();
 }
 
 double sigmoid(int i,double sum[]){
     double p;
-    double a = 0.05;
+    double a = 1.5;
     p = 1 / (1 + exp(-a * sum[i]));
     
     return p;
@@ -235,7 +235,7 @@ void CountState(double x[num]){
             }
         }
     }
-    printf("%s\n",str);
+    //printf("%s\n",str);
 
     if(!strcmp(str,"0000")){
         Pr_x[0] += 1.0; 
