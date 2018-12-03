@@ -26,11 +26,6 @@ void initialization(void);
 void CountState(double x[num]);
 void Probability(void);
 
-/*double a[num-1][num] = {
-    {0.0,1.0,1.0,-1.0},
-    {-2.0,1.0,0.0,1.0},
-    {1.0,0.0,-1.0,-1.0}
-};*/
 double a[num][num] = 
 { 
     {-2.0,1.0,1.0,1.0,-1.0},
@@ -92,7 +87,6 @@ int main(void){
                 }
                 //printf("sum[%d]:%lf\n",j,sum[j]);
                 //xの値を更新
-                //if(sum[j]>=0){
                 if(rand() < RAND_MAX * sigmoid(j,sum)){
                     x[j] = 1.0;
                 }
@@ -210,8 +204,6 @@ double SimultaneousEqu(double x[num]){
 void initialization(void){
     double ini_x[num] = {1.0,0.0,0.0,0.0,0.0};//最初の１はダミーニューロン
     int i;
-    
-    //srand((unsigned)time(NULL));//0と1を適当に決めるための乱数
     for(i=0;i<num;i++){
         x[i] = ini_x[i];
     }
