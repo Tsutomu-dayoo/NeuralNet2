@@ -99,6 +99,7 @@ int main(void){
                 else{
                     x[j] = 0.0;
                 }
+                /*
                 for(k=0;k<num;k++){
                     if(k != 0){ 
                         printf("x%d:%lf",k,x[k]);
@@ -107,16 +108,17 @@ int main(void){
                             printf("\n");
                         }
                     }
-                }
+                }*/
+                CountState(x);
                 //エネルギーの評価
-                E = SimultaneousEqu(x);
+                //E = SimultaneousEqu(x);
                 E = energy();
+                //printf("E:%lf\n",-0.5*E);
                 
             }
             sum[j] = 0.0;
         }
     }
-    printf("E:%lf\n",-0.5*E);
 }
 
 double sigmoid(int i,double sum[]){
@@ -233,7 +235,7 @@ void CountState(double x[num]){
             }
         }
     }
-    //printf("%s\n",str);
+    printf("%s\n",str);
 
     if(!strcmp(str,"0000")){
         Pr_x[0] += 1.0; 
