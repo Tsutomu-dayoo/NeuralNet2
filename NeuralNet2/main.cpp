@@ -26,7 +26,13 @@ void initialization(void);
 void CountState(double x[num]);
 void Probability(void);
 
-double a[num][num];
+double a[num][num] = 
+{ 
+    {-2.0,1.0,1.0,1.0,-1.0},
+    {-3.0,2.0,0.0,1.0,2.0,},
+    {1.0,2.0,0.0,-1.0,-1.0},
+    {1.0,3.0,-1.0,-1.0,-1.0}
+};
 double theta[num] = {0.0,-0.5,-0.5,-0.5,-0.5}; //閾値
 double w[num][num] = 
 { {0.0,theta[1],theta[2],theta[3],theta[4]},
